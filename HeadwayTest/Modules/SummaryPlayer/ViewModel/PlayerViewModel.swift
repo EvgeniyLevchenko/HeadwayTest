@@ -9,12 +9,6 @@ import AVFoundation
 
 final class PlayerViewModel: NSObject, ObservableObject {
     
-    // MARK: - PlayerError
-    
-    enum PlayerError: Error {
-        
-    }
-    
     // MARK: - SkipDirection
     
     enum SkipDirection {
@@ -163,8 +157,8 @@ final class PlayerViewModel: NSObject, ObservableObject {
                 return
             }
             let player = try AVAudioPlayer(contentsOf: url)
-            player.prepareToPlay()
             player.enableRate = true
+            player.prepareToPlay()
             player.delegate = self
             duration = player.duration
             self.player = player
