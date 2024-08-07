@@ -36,14 +36,16 @@ struct PlaybackView: View {
     @State private var isPlaying: Bool = false
     private let backwardAction: (() -> Void)?
     private let rewindBackAction: (() -> Void)?
-    private let playPauseAction: ((Bool) -> Void)?
+    private let playPauseAction: (() -> Void)?
     private let fastForwardAction: (() -> Void)?
     private let forwardAction: (() -> Void)?
+    
+    // MARK: - Init
     
     init(
         backwardAction: (() -> Void)? = nil,
         rewindBackAction: (() -> Void)? = nil,
-        playPauseAction: ((Bool) -> Void)? = nil,
+        playPauseAction: (() -> Void)? = nil,
         fastForwardAction: (() -> Void)? = nil,
         forwardAction: (() -> Void)? = nil
     ) {
@@ -62,6 +64,7 @@ struct PlaybackView: View {
         HStack(spacing: Constants.Layout.horizonatlStackSpacing) {
             Button(action: {
                 backwardAction?()
+                isPlaying = false
             }) {
                 Image(systemName: Constants.Images.backwardEnd)
                     .resizable()
@@ -86,7 +89,7 @@ struct PlaybackView: View {
             
             Button(action: {
                 isPlaying.toggle()
-                playPauseAction?(isPlaying)
+                playPauseAction?()
             }) {
                 Image(systemName:
                         isPlaying
@@ -98,7 +101,7 @@ struct PlaybackView: View {
                 .frame(
                     width: Constants.Layout.pausePlayButtonWidth,
                     height: Constants.Layout.pausePlayButtonHeight
-                    )
+                )
             }
             
             Button(action: {
@@ -115,6 +118,7 @@ struct PlaybackView: View {
             
             Button(action: {
                 forwardAction?()
+                isPlaying = false
             }) {
                 Image(systemName: Constants.Images.forwardEnd)
                     .resizable()

@@ -22,16 +22,16 @@ struct PlayerSwitcherView: View {
             static let rectangleWidth: CGFloat = 140
             static let rectangleHeight: CGFloat = 60
             static let circleSize: CGFloat = 50
-            static let circleOffset: CGFloat = 35
+            static let circleOffset: CGFloat = 38.5
             static let imageSize: CGFloat = 20
             static let buttonWidth: CGFloat = 70
             static let buttonHeight: CGFloat = 60
         }
     }
     
-    // MARK: - Private properties
+    // MARK: - Properties
     
-    @State private var isPlayerOpen: Bool = true
+    @Binding var isPlayerOpen: Bool
     
     var body: some View {
         HStack {
@@ -44,6 +44,10 @@ struct PlayerSwitcherView: View {
                     width: Constants.Layout.rectangleWidth,
                     height: Constants.Layout.rectangleHeight
                 )
+                .overlay(
+                    RoundedRectangle(cornerRadius: Constants.Layout.rectangleHeight / 2)
+                            .stroke(Color.customGray, lineWidth: 1)
+                )
                 
                 Circle()
                     .fill(Color.blue)
@@ -51,9 +55,10 @@ struct PlayerSwitcherView: View {
                         width: Constants.Layout.circleSize,
                         height: Constants.Layout.circleSize
                     )
-                    .offset(x: isPlayerOpen
-                            ? Constants.Layout.circleOffset
-                            : -Constants.Layout.circleOffset
+                    .offset(
+                        x: isPlayerOpen
+                        ? Constants.Layout.circleOffset
+                        : -Constants.Layout.circleOffset
                     )
                 
                 HStack {
@@ -97,8 +102,6 @@ struct PlayerSwitcherView: View {
                         height: Constants.Layout.buttonHeight
                     )
                 }
-                
-                
             }
         }
     }

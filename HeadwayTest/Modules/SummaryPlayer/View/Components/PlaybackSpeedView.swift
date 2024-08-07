@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// MARK: - PlaybackSpeed
+
+typealias PlaybackSpeed = PlaybackSpeedView.PlaybackSpeed
+
 // MARK: - PlaybackSpeedView
 
 struct PlaybackSpeedView: View {
@@ -28,7 +32,7 @@ struct PlaybackSpeedView: View {
     
     // MARK: - PlaybackSpeed
     
-    private enum PlaybackSpeed: Double, CaseIterable {
+    enum PlaybackSpeed: Float, CaseIterable {
         case x0_5 = 0.5
         case x0_75 = 0.75
         case x1 = 1.0
@@ -57,9 +61,9 @@ struct PlaybackSpeedView: View {
         }
     }
     
-    // MARK: - Private properties
+    // MARK: - Properties
     
-    @State private var playbackSpeed: PlaybackSpeed = .x1
+    @Binding var playbackSpeed: PlaybackSpeed
     
     // MARK: - Properties
     
@@ -86,6 +90,8 @@ struct PlaybackSpeedView: View {
             Constants.Layout.buttonPadding
         )
     }
+    
+    // MARK: - Private methods
     
     private func speedButtonTapped() {
         let allCases = PlaybackSpeed.allCases
