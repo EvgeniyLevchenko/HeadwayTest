@@ -23,6 +23,8 @@ struct PlayerView: View {
             static let keyPointText: String = "KEY POINT %d OF %d"
             static let durationText: String = "%d:%02d"
             static let bookDescriptionText: String = "To conquer fear is the beginning of wisdom"
+            static let loadingErrorTitle: String = "Loading error"
+            static let loadingErrorMessage: String = "An error occured while trying to load audio. Please try againg."
             static let playbackErrorTitle: String = "Playback Error"
             static let playbackErrorMessage: String = "An error occurred while trying to play the audio. Please try again."
             static let alertButtonTitle: String = "Try againg"
@@ -166,13 +168,23 @@ struct PlayerView: View {
         }
         .alert(
             Constants.Text.playbackErrorTitle,
-            isPresented: $viewModel.isShowingErrorAlert
+            isPresented: $viewModel.isShowingPlayerErrorAlert
         ) {
             Button(Constants.Text.alertButtonTitle, role: .cancel) {
                 viewModel.start()
             }
         } message: {
             Text(Constants.Text.playbackErrorMessage)
+        }
+        .alert(
+            Constants.Text.loadingErrorTitle,
+            isPresented: $viewModel.isShowingLoadingErrorAlert
+        ) {
+            Button(Constants.Text.alertButtonTitle, role: .cancel) {
+                viewModel.start()
+            }
+        } message: {
+            Text(Constants.Text.loadingErrorMessage)
         }
     }
     

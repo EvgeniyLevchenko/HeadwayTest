@@ -9,6 +9,12 @@ import AVFoundation
 
 final class PlayerViewModel: NSObject, ObservableObject {
     
+    // MARK: - PlayerError
+    
+    enum PlayerError: Error {
+        
+    }
+    
     // MARK: - SkipDirection
     
     enum SkipDirection {
@@ -20,6 +26,8 @@ final class PlayerViewModel: NSObject, ObservableObject {
     
     private enum Constants {
         static let keyPointFileName: String = "keyPoints"
+        static let rewindBackStep: Double = 5
+        static let fastForwardStep: Double = 10
     }
     
     // MARK: - Properties
@@ -27,7 +35,8 @@ final class PlayerViewModel: NSObject, ObservableObject {
     @Published private(set) var duration: Double = .zero
     @Published private(set) var currenKeyPointIndex: Int = .zero
     @Published private(set) var keyPoints: [BookKeyPoint] = []
-    @Published var isShowingErrorAlert = true
+    @Published var isShowingLoadingErrorAlert = false
+    @Published var isShowingPlayerErrorAlert = false
     @Published var isPlayerOpen = true
     @Published var sliderValue: Double = .zero
     @Published var playbackSpeed: PlaybackSpeed = .x1 {
@@ -55,12 +64,12 @@ final class PlayerViewModel: NSObject, ObservableObject {
     func skipKeyPoint(_ direction: SkipDirection) {
         switch direction {
         case .forward:
-            guard (0..<keyPoints.count).contains(currenKeyPointIndex + 1) else {
+            guard (.zero..<keyPoints.count).contains(currenKeyPointIndex + 1) else {
                 return
             }
             currenKeyPointIndex += 1
         case .backward:
-            guard (0..<keyPoints.count).contains(currenKeyPointIndex - 1) else {
+            guard (.zero..<keyPoints.count).contains(currenKeyPointIndex - 1) else {
                 return
             }
             currenKeyPointIndex -= 1
@@ -90,7 +99,10 @@ final class PlayerViewModel: NSObject, ObservableObject {
         guard let audioPlayer = player else {
             return
         }
-        audioPlayer.currentTime = max(0, audioPlayer.currentTime - 5)
+        audioPlayer.currentTime = max(
+            .zero,
+            audioPlayer.currentTime - Constants.rewindBackStep
+        )
     }
     
     /// Fast forward audio for 10 seconds
@@ -98,7 +110,10 @@ final class PlayerViewModel: NSObject, ObservableObject {
         guard let audioPlayer = player else {
             return
         }
-        audioPlayer.currentTime = min(audioPlayer.duration, audioPlayer.currentTime + 10)
+        audioPlayer.currentTime = min(
+            audioPlayer.duration,
+            audioPlayer.currentTime + Constants.fastForwardStep
+        )
     }
     
     /// Update slider value
@@ -120,7 +135,7 @@ final class PlayerViewModel: NSObject, ObservableObject {
     
     /// Switch between book chapters
     private func switchChapter(to keyPoint: Int) {
-        guard (0..<keyPoints.count).contains(keyPoint) else {
+        guard (.zero..<keyPoints.count).contains(keyPoint) else {
             return
         }
         let keyPointName = keyPoints[currenKeyPointIndex].name
@@ -130,20 +145,21 @@ final class PlayerViewModel: NSObject, ObservableObject {
     /// Load key points of the book from JSON
     private func loadKeyPoints(from filename: String) {
         do {
-            guard let data = try JSONLoader().loadJSON(from: filename) else {
-                isShowingErrorAlert = true
+            guard let data = try? JSONLoader().loadJSON(from: filename) else {
+                isShowingLoadingErrorAlert = true
                 return
             }
             keyPoints = try JSONDecoder().decode([BookKeyPoint].self, from: data)
         } catch {
-            isShowingErrorAlert = true
+            isShowingLoadingErrorAlert = true
         }
     }
     
     /// Load audio from a file
     private func loadAudio(from filename: String) {
         do {
-            guard let url = try MP3Loader().loadMP3(from: filename) else {
+            guard let url = try? MP3Loader().loadMP3(from: filename) else {
+                isShowingLoadingErrorAlert = true
                 return
             }
             let player = try AVAudioPlayer(contentsOf: url)
@@ -153,7 +169,7 @@ final class PlayerViewModel: NSObject, ObservableObject {
             duration = player.duration
             self.player = player
         } catch {
-            
+            isShowingPlayerErrorAlert = true
         }
     }
     
